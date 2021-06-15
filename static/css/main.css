@@ -1,0 +1,14 @@
+body {
+    font-family: sans-serif;
+}
+
+div.content {
+    font-family: sans-serif;
+    margin-left: 10%;
+    margin-right: 10%;
+}
+div.forms {
+    margin-top: 3%;
+    margin-left: 25%;
+    margin-right: 25%;
+}

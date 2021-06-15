@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+    <div class="forms">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Cadastre-se</legend>
+                <div class="form-group">
+                    {{ form.nome.label(class="form-control-label") }}
+
+                    <!-- Se algum erro for detectado no preenchimento dos campos, o usuário receberá um feedback -->
+                    {% if form.nome.errors %}
+                        {{ form.nome(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.nome(class="form-control form-control-lg") }}
+                    {% endif %}
+
+                </div>
+                <div class="form-group">
+                    {{ form.cpf.label(class="form-control-label") }}
+                    {% if form.cpf.errors %}
+                        {{ form.cpf(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.cpf.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.cpf(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.senha.label(class="form-control-label") }}
+                    {% if form.senha.errors %}
+                        {{ form.senha(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.senha.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.senha(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.confirmar_senha.label(class="form-control-label") }}
+                    {% if form.confirmar_senha.errors %}
+                        {{ form.confirmar_senha(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirmar_senha.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.confirmar_senha(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info")}}
+            </div>
+        </form>
+    </div>
+    <div class="forms border-top pt-3">
+        <small class="text-muted">
+            Já possui uma conta? 
+            <a class="ml-2" href="{{ url_for('login') }}">Fazer login</a>
+        </small>
+    </div>
+{% endblock %}
