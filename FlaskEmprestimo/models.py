@@ -1,8 +1,6 @@
-from enum import unique
-from sqlalchemy.orm import backref
-from app import db
+from FlaskEmprestimo import db
 
-# Criação das tabelas do banco de dados local
+# Criação das classes que darão origem às tabelas do banco de dados local
 
 class Usuario(db.Model):
 
@@ -11,7 +9,7 @@ class Usuario(db.Model):
     cpf = db.Column(db.String(11), nullable = False, unique=True)
     senha = db.Column(db.String(60), nullable=False)
     salario = db.Column(db.Integer)
-    emprestimos = db.relationship('Emprestimo', backref='', lazy=True)
+    emprestimos = db.relationship('Emprestimo', backref='beneficiado', lazy=True)
 
     def __repr__(self):
         return f"Usuário: ('{self.nome}', '{self.cpf}')"
