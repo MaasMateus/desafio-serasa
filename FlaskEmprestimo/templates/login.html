@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
+<div class="border">
     <div class="forms">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
@@ -43,10 +44,11 @@
             </div>
         </form>
     </div>
-    <div class="forms border-top pt-3">
+    <div class="forms border-top pt-3 mb-3">
         <small class="text-muted">
             Não possui uma conta? 
             <a class="ml-2" href="{{ url_for('cadastro') }}">Fazer cadastro</a>
         </small>
     </div>
+</div>
 {% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<div class="border">
+    <div class="info mt-3">
+        <h1>{{ current_user.nome }}</h1>
+        <hr>
+        <p>CPF: {{ current_user.cpf }}</p>
+        <p>E-mail: {{current_user.email}}</p>
+        {% if current_user.salario %}
+            <p>Salário: {{ current_user.salario }}</p>
+        {% else %}
+            <p>Salário não informado</p>
+        {% endif %}
+
+        <p>Emprestimos ativos: {{ qtd_emprestimos }}</p>
+        <small class="text-muted">
+            <a href="#">Detalhes</a>
+        </small>
+    </div>
+</div>
+{% endblock %}

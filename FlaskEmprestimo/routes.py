@@ -2,7 +2,7 @@ from flask import render_template, flash, url_for, request, redirect
 from FlaskEmprestimo import app, db, bcrypt
 from FlaskEmprestimo.models import Usuario, Emprestimo
 from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm
-from flask_login import login_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 
 # Definição das rotas do site, métodos e usados nelas e as páginas que devem ser retornadas
   
@@ -52,6 +52,9 @@ def login():
 
     Caso o CPF e senha sejam correspondentes, uma sessão será iniciada para este
     usuário, que pode assinalar um checkbox para se manter logado.
+
+    Caso o usuário tente fazer uma ação que requer estar logado numa conta, ele pode
+    realizar o login e então será redirecionado para a página que tentou acessar anteriormente 
     """
     if current_user.is_authenticated:
         return(redirect(url_for('index')))
@@ -62,8 +65,31 @@ def login():
         usuario = Usuario.query.filter_by(cpf=form.cpf.data).first()
         if usuario and bcrypt.check_password_hash(usuario.senha, form.senha.data):
             login_user(usuario, form.lembrar.data)
-            return(redirect(url_for('index')))
+            proxima_pag = request.args.get('next')
+
+            return redirect(proxima_pag) if proxima_pag else redirect(url_for('index'))
         else:
             flash('Login mal sucedido. Verifique seu CPF e sua senha', 'danger')
 
     return render_template('login.html', title='Login', form=form)
+
+@app.route('/logout')
+def logout():
+    """
+    Apenas disponível quando um usuário já está logado, apenas desloga a conta e atualiza a páginia.
+    """
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/perfil')
+@login_required
+def perfil():
+    """
+    Apenas disponível quando um usuário já está logado....
+    """
+    qtd_emprestimos = 0
+    emprestimos = Usuario.query.filter_by(id=current_user.id).first().emprestimos
+    for emprestimo in emprestimos:
+        if emprestimo.ativo:
+            qtd_emprestimos += 1 
+    return render_template('perfil.html', title='Perfil', qtd_emprestimos=qtd_emprestimos)
