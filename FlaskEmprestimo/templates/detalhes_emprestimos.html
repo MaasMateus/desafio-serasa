@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<h1 class="mb-4">Seus empréstimos</h1>
+<div class="border">
+    {% for emprestimo in emprestimos %}
+    {% if emprestimo.ativo %}
+    <div class="container">
+        <div class="p-2 row text-black" style="background-color: lightcoral; border-radius: 5px;">
+            <div class="col-1">
+                <b>Ativo</b>
+            </div>
+            <div class="col-8">
+                <p>{{ emprestimo }}</p>
+            </div>
+            <div class="col-2 align-left">
+                <p>Pagar parcela</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="container">
+        <div class="p-2 row text-black" style="background-color:palegreen; border-radius: 5px;">
+            <div class="col-1">
+                <b>Pago</b>
+            </div>
+            <div class="col-9">
+                <p>{{ emprestimo }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

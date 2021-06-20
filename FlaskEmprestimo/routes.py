@@ -85,7 +85,7 @@ def logout():
 @login_required
 def perfil():
     """
-    Apenas disponível quando um usuário já está logado....
+    Apenas disponível quando um usuário já está logado exibe as informações do perfil do usuário
     """
     qtd_emprestimos = 0
     emprestimos = Usuario.query.filter_by(id=current_user.id).first().emprestimos
@@ -93,3 +93,12 @@ def perfil():
         if emprestimo.ativo:
             qtd_emprestimos += 1 
     return render_template('perfil.html', title='Perfil', qtd_emprestimos=qtd_emprestimos)
+
+@app.route('/perfil/detalhes_emprestimos')
+@login_required
+def detalhes_perfil():
+
+    emprestimos = Emprestimo.query.filter_by(beneficiado=current_user).order_by(Emprestimo.ativo)
+    
+
+    return render_template('detalhes_emprestimos.html',title='Detalhes', emprestimos=emprestimos)
