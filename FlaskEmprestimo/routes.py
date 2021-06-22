@@ -1,7 +1,7 @@
 from flask import render_template, flash, url_for, request, redirect
 from FlaskEmprestimo import app, db, bcrypt
 from FlaskEmprestimo.models import Usuario, Emprestimo
-from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm
+from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm, PedirEmprestimoForm
 from flask_login import login_user, logout_user, current_user, login_required
 
 # Definição das rotas do site, métodos e usados nelas e as páginas que devem ser retornadas
@@ -10,8 +10,12 @@ from flask_login import login_user, logout_user, current_user, login_required
 def index():
     """
     Carrega a página principal quando se inicia a aplicação e quando o usuário volta para ela.
+    Se o usuário não está logado, ele será redirecionado para a página de requisição de empréstimos. 
     """
-    return render_template('index.html')
+    if current_user.is_authenticated:
+        return render_template('index.html')
+    else:
+        return redirect(url_for('emprestimo'))
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 
@@ -85,7 +89,7 @@ def logout():
 @login_required
 def perfil():
     """
-    Apenas disponível quando um usuário já está logado exibe as informações do perfil do usuário
+    Apenas disponível quando um usuário estiver logado, exibe as informações do perfil do usuário
     """
     qtd_emprestimos = 0
     emprestimos = Usuario.query.filter_by(id=current_user.id).first().emprestimos
@@ -97,8 +101,25 @@ def perfil():
 @app.route('/perfil/detalhes_emprestimos')
 @login_required
 def detalhes_perfil():
-
+    """
+    Apenas disponível quando um usuário estiver logado, mostra o histórico de empréstimos do
+    usuário e quais deles ainda estão ativos
+    """
     emprestimos = Emprestimo.query.filter_by(beneficiado=current_user).order_by(Emprestimo.ativo)
-    
-
     return render_template('detalhes_emprestimos.html',title='Detalhes', emprestimos=emprestimos)
+
+@app.route('/emprestimo')
+def emprestimo():
+    """
+    Responsável por renderizar os campos que devem ser preenchidos por um usuário para que
+    ele possa pedir um empréstimo. O empréstimo pode apenas ser concluído se o usuário estiver logado.
+    É a página para a qual um usuário é redirecionado caso não esteja logado.
+    """
+    form = PedirEmprestimoForm()
+    return render_template('emprestimo.html', title='Emprestimo', form=form)
+
+@app.route('/emprestimo/confirmar_emprestimo')
+@login_required
+def confirmar_emprestimo():
+    pass
+    

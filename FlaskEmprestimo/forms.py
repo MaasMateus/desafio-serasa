@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, BooleanField, PasswordField, TextAreaField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationError
+from wtforms import StringField, SubmitField, BooleanField, PasswordField, DecimalField
+from wtforms.fields.core import SelectField
+from wtforms.validators import DataRequired, Length, EqualTo, Email, NumberRange, ValidationError
 from FlaskEmprestimo.models import Usuario
 
 class CadastrarUsuarioForm(FlaskForm):
@@ -100,3 +101,26 @@ class LoginForm(FlaskForm):
     lembrar = BooleanField('Lembrar usuário')
 
     submit = SubmitField('Entrar')
+
+
+class PedirEmprestimoForm(FlaskForm):
+
+    valor = DecimalField('Valor do empréstimo (R$):',
+        validators=[DataRequired(message='O preenchimento deste campo é obrigatório'),
+        NumberRange(min=1000, max=20000, message='O valor mínimo para emprestimos é R$ 1000.00 e o máximo R$ 20000.00')])
+
+    parcelas = SelectField('Quantidade de parcelas:',
+        validators=[DataRequired(message='O preenchimento deste campo é obrigatório')],
+        choices=[
+            ('11', 12),
+            ('18', 18),
+            ('24', 24)
+        ])
+
+    salario = DecimalField('Sua renda mensal:',
+        validators=[DataRequired(message='O preenchimento deste campo é obrigatório'),
+        NumberRange(min=0, max=50000)])
+
+    submit = SubmitField('Pedir')
+
+
