@@ -13,14 +13,14 @@
           <div class="form-group">
             {{ form.valor.label(class="form-control-label") }}
             {% if form.valor.errors %}
-            {{ form.valor(class="form-control form-control-md is-invalid", placeholder="Min: R$ 1000 Max: R$ 20000")}}
+            {{ form.valor(class="form-control form-control-md is-invalid", placeholder="Min: R$ 1000 Max: R$ 50000")}}
             <div class="invalid-feedback">
               {% for error in form.valor.errors %}
               <span>{{ error }}</span>
               {% endfor %}
             </div>
             {% else %}
-            {{ form.valor(class="form-control form-control-md", placeholder="Min: R$ 1000.00 Max:R$ 20000.00") }}
+            {{ form.valor(class="form-control form-control-md", placeholder="Min: R$ 1000.00 Max:R$ 50000.00") }}
             {% endif %}
           </div>
         </div>

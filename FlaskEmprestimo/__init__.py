@@ -22,7 +22,27 @@ def is_number(n):
     except ValueError:
         return False
 
-# Função para checar se um valor pe ou não um número
+# Função para checar se um valor é ou não um número
+
+def ofertas(usuario):
+    parcela_max = usuario.salario / 10 * 3
+    ofertas = []
+    if parcela_max > 1600:
+        valor = 50000
+        parcelas = 36
+        oferta = {
+            'titulo': 'Está querendo trocar de carro?',
+            'valor': valor,
+            'parcelas': parcelas,
+
+        }
+        ofertas.append(oferta)
+    # if parcela_max
+
+    return ofertas
+
+# Retorna para o usuário 3 ofertas, dependendo de sua renda mensal
+
 
 # Import após a inicialização do programa pois alguns módulos importados requerem
 # variáveis inicializadas acima

@@ -1,19 +1,22 @@
 from flask import render_template, flash, url_for, request, redirect
-from FlaskEmprestimo import app, db, bcrypt, is_number
+from FlaskEmprestimo import app, db, bcrypt, is_number, ofertas
 from FlaskEmprestimo.models import Usuario, Emprestimo
 from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm, PedirEmprestimoForm, ConfirmarEmprestimoForm
 from flask_login import login_user, logout_user, current_user, login_required
 
 # Definição das rotas do site, métodos e usados nelas e as páginas que devem ser retornadas
   
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     """
     Carrega a página principal quando se inicia a aplicação e quando o usuário volta para ela.
     Se o usuário não está logado, ele será redirecionado para a página de requisição de empréstimos. 
     """
     if current_user.is_authenticated:
-        return render_template('index.html')
+
+        lista_ofertas = ofertas(current_user)
+
+        return render_template('index.html', ofertas=lista_ofertas)
     else:
         return redirect(url_for('emprestimo'))
 
@@ -130,22 +133,24 @@ def confirmar_emprestimo():
     hora de redirecionar o usuário de volta para a página, por conta da falta de valores nos formulários que são
     pedidos na rota /emprestimo.
     A função is_number() é utilizada para garantir que nenhum valor que não possa ser convertido para um valor
-    numérico possa ser passado tanto para o valor do empréstimo quanto para o salário do usuário.
+    numérico possa ser atribuído tanto para o valor do empréstimo quanto para o salário do usuário.
+    O usuário pode chegar à essa rota através da rota /emprestimo ou clicando em uma oferta na página inicial,
+    as ofertas passam valores por URL e a rota /emprestimo passa os valores por formulário.
     """
     
     if not current_user.is_authenticated:
         return redirect(url_for('index'))
     form = ConfirmarEmprestimoForm()
-    
-    valor = request.form.get('valor')
+
+    valor = request.values.get('valor')
     if is_number(valor):
 
-        salario = request.form.get('salario')
+        salario = request.values.get('salario')
         if is_number(salario):
 
-            valor = round(float(request.form.get('valor')), 2)
-            parcelas = int(request.form.get('parcelas'))
-            salario = float(request.form.get('salario'))
+            valor = round(float(request.values.get('valor')), 2)
+            parcelas = int(request.values.get('parcelas'))
+            salario = float(request.values.get('salario'))
             valor_a_pagar = round(float(valor) * 1.15, 2)
             data = {
                 'valor': valor,
@@ -154,8 +159,8 @@ def confirmar_emprestimo():
                 'valor_a_pagar': valor_a_pagar,
                 'valor_parcela': round(valor_a_pagar / parcelas, 2),
             }
-            if valor > 20000:
-                flash('Valor muito alto, o empréstimo deve ser menor que R$ 20000.00','danger')
+            if valor > 50000:
+                flash('Valor muito alto, o empréstimo deve ser menor que R$ 50000.00','danger')
                 return redirect(url_for('emprestimo'))
 
             elif valor < 1000:
@@ -190,7 +195,7 @@ def upload_emprestimo():
             if emprestimo.valor_parcela > float(r['salario']) / 10 * 3:
                 flash('Sua requisição foi enviada para analize', 'danger')
 
-            return redirect(url_for('detalhes_emprestimo'))
+            return redirect(url_for('detalhes_emprestimos'))
         else:
             pass # unknown
     return redirect(url_for('emprestimo'))
