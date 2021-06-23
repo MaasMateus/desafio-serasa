@@ -89,4 +89,4 @@ class Emprestimo(db.Model):
     def __repr__(self):
         return f"""Valor total: R$ {self.valor}
 Parcelas restantes: {self.parcelas_restantes}
-Valor à ser pago: {self.valor_parcela * self.parcelas_restantes}"""
+Valor à ser pago: {self.valor_parcela * self.parcelas_restantes:.2f}"""

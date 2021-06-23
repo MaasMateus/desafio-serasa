@@ -27,14 +27,51 @@ def is_number(n):
 def ofertas(usuario):
     parcela_max = usuario.salario / 10 * 3
     ofertas = []
+    oferta = {
+        'titulo': 'Gostaria de ajuda para pagar suas dívidas?',
+        'valor': 3000,
+        'parcelas': 12
+    }
+    ofertas.append(oferta)
+
     if parcela_max > 1600:
         valor = 50000
         parcelas = 36
         oferta = {
             'titulo': 'Está querendo trocar de carro?',
             'valor': valor,
-            'parcelas': parcelas,
+            'parcelas': parcelas
+        }
+        ofertas.append(oferta)
 
+    if parcela_max > 385:
+        valor = 10000
+        parcelas = 30
+        oferta = {
+            'titulo': 'Gostaria de fazer uma reforma na susa casa?',
+            'valor': valor,
+            'parcelas': parcelas,
+        }
+        ofertas.append(oferta)
+
+    if parcela_max > 480:
+        valor = 7500
+        parcelas = 18
+        oferta = {
+            'titulo': 'Gostaria de agendar sua próxima viagem?',
+            'valor': valor,
+            'parcelas': parcelas,
+        }
+        
+        ofertas.append(oferta)
+    
+    if parcela_max > 480:
+        valor = 10000
+        parcelas = 24
+        oferta = {
+            'titulo': 'Está precisando de uma mãozinha com algum procedimento médico?',
+            'valor': valor,
+            'parcelas': parcelas,
         }
         ofertas.append(oferta)
     # if parcela_max

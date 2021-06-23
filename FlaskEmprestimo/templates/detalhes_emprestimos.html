@@ -4,21 +4,23 @@
 {% if current_user.emprestimos %}
 <h1 class="mb-4">Seus empréstimos</h1>
 <div class="border">
-    {% for emprestimo in current_user.emprestimos %}
+    {% for emprestimo in emprestimos %}
     {% if emprestimo.ativo %}
-    <div class="container">
-        <div class="p-2 row text-black" style="background-color: lightcoral; border-radius: 5px;">
-            <div class="col-1">
-                <b>Ativo</b>
-            </div>
-            <div class="col-8">
-                <p>{{ emprestimo }}</p>
-            </div>
-            <div class="col-2 align-left">
-                <p>Pagar parcela</p>
+    <form method="POST" action="{{ url_for('pagar_emprestimo', emprestimo_id=emprestimo.id) }}">
+        <div class="container">
+            <div class="p-2 row text-black" style="background-color: lightcoral; border-radius: 5px;">
+                <div class="col-1">
+                    <b>Ativo</b>
+                </div>
+                <div class="col-8">
+                    <p>{{ emprestimo }}</p>
+                </div>
+                <div class="col-2 align-left">
+                    <input type="submit" name="submit_btn" value="Pagar parcela" class="btn btn-secondary">
+                </div>
             </div>
         </div>
-    </div>
+    </form>
     {% else %}
     <div class="container">
         <div class="p-2 row text-black" style="background-color:palegreen; border-radius: 5px;">

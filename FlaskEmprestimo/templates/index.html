@@ -21,13 +21,13 @@
     <div class="mt-3">
         {% for oferta in ofertas %}
         <form action="{{ url_for('confirmar_emprestimo', valor=oferta['valor'], parcelas=oferta['parcelas'], salario=current_user.salario) }}" method="POST">
-            <div class="card m-3" style="width: 30%;">
+            <div class="card m-3" style="width: 100%;">
                 <div class="card-header">
                     {{ oferta['titulo'] }}
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ "R$%.2f"|format(oferta['valor']) }}</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                    <p class="card-text">Em {{ oferta['parcelas'] }}x!</p>
                     <input type="submit" name="submit_btn" value="Pedir" class="btn btn-outline-info">
                 </div>
             </div>

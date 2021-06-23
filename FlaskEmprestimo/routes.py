@@ -1,4 +1,4 @@
-from flask import render_template, flash, url_for, request, redirect
+from flask import render_template, flash, url_for, request, redirect, abort
 from FlaskEmprestimo import app, db, bcrypt, is_number, ofertas
 from FlaskEmprestimo.models import Usuario, Emprestimo
 from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm, PedirEmprestimoForm, ConfirmarEmprestimoForm
@@ -110,7 +110,9 @@ def detalhes_emprestimos():
     Apenas disponível quando um usuário estiver logado, mostra o histórico de empréstimos do
     usuário e quais deles ainda estão ativos
     """
-    return render_template('detalhes_emprestimos.html',title='Detalhes')
+    emprestimos = Emprestimo.query.filter_by(beneficiado=current_user).order_by(Emprestimo.parcelas_restantes)
+
+    return render_template('detalhes_emprestimos.html',title='Detalhes', emprestimos=emprestimos)
 
 @app.route('/emprestimo', methods=['GET', 'POST'])
 def emprestimo():
@@ -166,7 +168,13 @@ def confirmar_emprestimo():
             elif valor < 1000:
                 flash('Valor muito baixo, o empréstimo deve ser maior que R$ 1000.00','danger')
                 return redirect(url_for('emprestimo'))
-                        
+            
+            salario_ativo = Usuario.query.filter_by(id=current_user.id)
+            if salario_ativo != salario:
+                current_user.salario = salario
+                db.session.commit()
+                flash('Sua renda foi atualizada',' success')
+
             return render_template('confirmar_emprestimo.html', form=form, data=data)
     
         else:
@@ -199,3 +207,18 @@ def upload_emprestimo():
         else:
             pass # unknown
     return redirect(url_for('emprestimo'))
+
+@app.route('/perfil/emprestimos/pagar/<int:emprestimo_id>', methods=['GET', 'POST'])
+@login_required
+def pagar_emprestimo(emprestimo_id):
+    emprestimo = Emprestimo.query.get_or_404(emprestimo_id)
+    if emprestimo.beneficiado != current_user:
+        abort(403)
+    else:
+        emprestimo.parcelas_restantes -= 1
+        if emprestimo.parcelas_restantes == 0:
+            emprestimo.ativo = False
+
+        db.session.commit()
+        flash('Parcela do empréstimo paga!', 'success')
+        return redirect(url_for('detalhes_emprestimos'))
