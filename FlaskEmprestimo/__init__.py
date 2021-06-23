@@ -15,6 +15,15 @@ login_manager.login_view = 'login'
 login_manager.login_message = 'Você precisa estar logado para acessar essa página'
 login_manager.login_message_category = 'info'
 
+def is_number(n):
+    try:
+        float(n)
+        return True
+    except ValueError:
+        return False
+
+# Função para checar se um valor pe ou não um número
+
 # Import após a inicialização do programa pois alguns módulos importados requerem
 # variáveis inicializadas acima
 from FlaskEmprestimo import routes

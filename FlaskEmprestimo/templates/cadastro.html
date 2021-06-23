@@ -14,7 +14,7 @@
                     {% if form.nome.errors %}
                     {{ form.nome(class="form-control form-control-lg is-invalid") }}
                     <div class="invalid-feedback">
-                        {% for error in form.username.errors %}
+                        {% for error in form.nome.errors %}
                         <span>{{ error }}</span>
                         {% endfor %}
                     </div>
@@ -75,7 +75,24 @@
                     {{ form.confirmar_senha(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
+                <div class="form-group">
+                    {{ form.salario.label(class="form-control-label") }}
+                    {% if form.salario.errors %}
+                    {{ form.salario(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.salario.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    {{ form.salario(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
             </fieldset>
+            <div class="form-check">
+                {{ form.lembrar(class="form-check-input") }}
+                {{ form.lembrar.label(class="form-check-label") }}
+            </div>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info")}}
             </div>

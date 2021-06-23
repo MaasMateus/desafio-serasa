@@ -1,4 +1,5 @@
 from enum import unique
+from logging import NullHandler
 from FlaskEmprestimo import db, login_manager
 from flask_login import UserMixin
 
@@ -44,7 +45,7 @@ class Usuario(db.Model, UserMixin):
     cpf = db.Column(db.String(11), nullable = False, unique=True)
     email = db.Column(db.String(50), nullable=False, unique=True)
     senha = db.Column(db.String(60), nullable=False)
-    salario = db.Column(db.Integer)
+    salario = db.Column(db.Float, nullable=False)
     emprestimos = db.relationship('Emprestimo', backref='beneficiado', lazy=True)
 
     def __repr__(self):
@@ -78,9 +79,9 @@ class Emprestimo(db.Model):
         id_usuario = Chave estrangeira, identifica a qual usuário o empréstimo está vinculado
     """
     id = db.Column(db.Integer, primary_key=True)
-    valor = db.Column(db.Integer, nullable=False)
+    valor = db.Column(db.Float, nullable=False)
     parcelas = db.Column(db.Integer, nullable=False)
-    valor_parcela = db.Column(db.Integer, nullable=False)
+    valor_parcela = db.Column(db.Float, nullable=False)
     parcelas_restantes = db.Column(db.Integer, nullable=False)
     ativo = db.Column(db.Boolean)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)

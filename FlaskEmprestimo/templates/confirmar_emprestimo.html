@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<h1 class="mb-4">Confirmar empréstimo</h1>
+<div class="border">
+    <div class="m-3">
+    <form method="POST" action="{{ url_for('upload_emprestimo') }}">
+        
+        <fieldset class="form-group">
+            <div class="form-group">
+                {{ form.valor.label(class="form-control-label") }}
+                {{ form.valor(class="form-control form-control-md", value=data.valor, readonly=true) }}
+            </div>
+            <div class="form-group">
+                {{ form.parcelas.label(class="form-control-label") }}
+                {{ form.parcelas(class="form-control form-control-md", value=data.parcelas,  readonly=true) }}
+            </div>
+            <div class="form-group">
+                {{ form.salario.label(class="form-control-label") }}
+                {{ form.salario(class="form-control form-control-md", value=data.salario, readonly=true) }}
+            </div>            
+            <div class="form-group">
+                {{ form.valor_a_pagar.label(class="form-control-label") }}
+                {{ form.valor_a_pagar(class="form-control form-control-md", value=data.valor_a_pagar, readonly=true) }}
+            </div>
+            <div class="form-group">
+                {{ form.valor_parcela.label(class="form-control-label") }}
+                {{ form.valor_parcela(class="form-control form-control-md", value=data.valor_parcela, readonly=true) }}
+            </div>
+            {% if data.valor_parcela > data.salario / 10 * 3 %}
+            <div class="mb-3">
+                <small class="text-danger">Não recomendamos pedir empréstimos cujas parcelas sejam mais que 30% do seu salário, como este é. O valor ideal seria abixo de {{ data.salario / 10 * 3  }} por mês</small>
+                <br>
+                <small class="text-danger">Se confirmar que quer este empréstimo, ele terá que ser avaliado por nossa equipe antes de ser liberado</small>
+            </div>
+            {% endif %}
+
+        <input type="submit" name="submit_btn" value="Cancelar" class="btn btn-outline-info">
+        <input type="submit" name="submit_btn" value="Confirmar" class="btn btn-info">
+    </form>
+</div>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 from flask import render_template, flash, url_for, request, redirect
-from FlaskEmprestimo import app, db, bcrypt
+from FlaskEmprestimo import app, db, bcrypt, is_number
 from FlaskEmprestimo.models import Usuario, Emprestimo
-from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm, PedirEmprestimoForm
+from FlaskEmprestimo.forms import CadastrarUsuarioForm, LoginForm, PedirEmprestimoForm, ConfirmarEmprestimoForm
 from flask_login import login_user, logout_user, current_user, login_required
 
 # Definição das rotas do site, métodos e usados nelas e as páginas que devem ser retornadas
@@ -34,9 +34,11 @@ def cadastro():
     if form.validate_on_submit():
         
         senha_hash = bcrypt.generate_password_hash(form.senha.data).decode('utf-8')
-        usuario = Usuario(nome=form.nome.data, cpf=form.cpf.data, email=form.email.data,senha=senha_hash)
+        usuario = Usuario(nome=form.nome.data, cpf=form.cpf.data, email=form.email.data,
+            senha=senha_hash, salario=form.salario.data)
         db.session.add(usuario)
         db.session.commit()
+        login_user(usuario, form.lembrar.data)
 
         flash('Conta criada com sucesso!', 'success')
         return redirect(url_for('index'))
@@ -98,17 +100,16 @@ def perfil():
             qtd_emprestimos += 1 
     return render_template('perfil.html', title='Perfil', qtd_emprestimos=qtd_emprestimos)
 
-@app.route('/perfil/detalhes_emprestimos')
+@app.route('/perfil/emprestimos')
 @login_required
-def detalhes_perfil():
+def detalhes_emprestimos():
     """
     Apenas disponível quando um usuário estiver logado, mostra o histórico de empréstimos do
     usuário e quais deles ainda estão ativos
     """
-    emprestimos = Emprestimo.query.filter_by(beneficiado=current_user).order_by(Emprestimo.ativo)
-    return render_template('detalhes_emprestimos.html',title='Detalhes', emprestimos=emprestimos)
+    return render_template('detalhes_emprestimos.html',title='Detalhes')
 
-@app.route('/emprestimo')
+@app.route('/emprestimo', methods=['GET', 'POST'])
 def emprestimo():
     """
     Responsável por renderizar os campos que devem ser preenchidos por um usuário para que
@@ -116,10 +117,80 @@ def emprestimo():
     É a página para a qual um usuário é redirecionado caso não esteja logado.
     """
     form = PedirEmprestimoForm()
+
     return render_template('emprestimo.html', title='Emprestimo', form=form)
 
-@app.route('/emprestimo/confirmar_emprestimo')
-@login_required
+@app.route('/emprestimo/confirmar', methods=['GET', 'POST'])
 def confirmar_emprestimo():
-    pass
+    """
+    Tela para revisão do empréstimo, onde são mostradas informações mais detalhadas sobre o empréstimo
+    que o usuário deseja, verifica se o valor do empréstimo está dentro dos limites oferecidos e retorna
+    mensagens de erro caso não seja.
+    Checa se o usuário está logado através de if, ao invés de com @login_required por conta de erros na 
+    hora de redirecionar o usuário de volta para a página, por conta da falta de valores nos formulários que são
+    pedidos na rota /emprestimo.
+    A função is_number() é utilizada para garantir que nenhum valor que não possa ser convertido para um valor
+    numérico possa ser passado tanto para o valor do empréstimo quanto para o salário do usuário.
+    """
     
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = ConfirmarEmprestimoForm()
+    
+    valor = request.form.get('valor')
+    if is_number(valor):
+
+        salario = request.form.get('salario')
+        if is_number(salario):
+
+            valor = round(float(request.form.get('valor')), 2)
+            parcelas = int(request.form.get('parcelas'))
+            salario = float(request.form.get('salario'))
+            valor_a_pagar = round(float(valor) * 1.15, 2)
+            data = {
+                'valor': valor,
+                'parcelas': parcelas,
+                'salario': salario,
+                'valor_a_pagar': valor_a_pagar,
+                'valor_parcela': round(valor_a_pagar / parcelas, 2),
+            }
+            if valor > 20000:
+                flash('Valor muito alto, o empréstimo deve ser menor que R$ 20000.00','danger')
+                return redirect(url_for('emprestimo'))
+
+            elif valor < 1000:
+                flash('Valor muito baixo, o empréstimo deve ser maior que R$ 1000.00','danger')
+                return redirect(url_for('emprestimo'))
+                        
+            return render_template('confirmar_emprestimo.html', form=form, data=data)
+    
+        else:
+            flash('Valor de salário invalido','danger')
+        return redirect(url_for('emprestimo'))
+    else:
+        flash('Valor para empréstimo invalido','danger')
+        return redirect(url_for('emprestimo'))
+
+@app.route('/emprestimo/confirmar/upload', methods=['GET', 'POST'])
+@login_required
+def upload_emprestimo():
+    if request.method == 'POST':
+        if request.form['submit_btn'] == 'Cancelar':
+            flash('Empréstimo cancelado','danger')
+            return redirect(url_for('emprestimo'))
+        elif request.form['submit_btn'] == 'Confirmar':
+            r = request.form
+
+            emprestimo = Emprestimo(valor=float(r['valor_a_pagar']), parcelas=int(r['parcelas']), valor_parcela=float(r['valor_parcela']),
+                    parcelas_restantes=int(r['parcelas']), ativo=True, id_usuario=current_user.id)
+
+            db.session.add(emprestimo)
+            db.session.commit()
+
+            if emprestimo.valor_parcela > float(r['salario']) / 10 * 3:
+                flash('Sua requisição foi enviada para analize', 'danger')
+
+            return redirect(url_for('detalhes_emprestimo'))
+        else:
+            pass # unknown
+    return redirect(url_for('emprestimo'))

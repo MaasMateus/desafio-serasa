@@ -1,5 +1,22 @@
 {% extends 'base.html' %}
 
 {% block conteudo %}
-<h1>Index</h1>
+<h1>Bem-Vindo(a)!</h1>
+<div class="border">
+    <div class="m-3">
+        <h3>Que bom ter você de volta! O que deseja fazer?</h3>
+        <ul class="list-unstyled">
+            <li class="mb-3 mt-3">
+                <a href="{{ url_for('emprestimo') }}">Novo empréstimo</a>
+            </li>
+            <li>
+                <a href="{{ url_for('detalhes_emprestimos') }}">Detalhamento de seus empréstimos</a>
+            </li>
+    </div>
+</div>
+<div class="border mt-3">
+    <div class="m-3">
+        <h3>Ofertas especiais para você</h3>
+    </div>
+</div>
 {% endblock %}
